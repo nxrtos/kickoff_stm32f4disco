@@ -105,6 +105,16 @@ int main(void)
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
 
+    {
+    	static	unsigned long count = 0;
+
+    	if (++count >= 0xffff)
+    	{
+    		count = 0;
+    		HAL_GPIO_TogglePin(GPIOD, LD4_Pin|LD3_Pin|LD5_Pin|LD6_Pin);
+    	}
+    }
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
