@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>kickoff_stm32f4disco</name>
+	<name>kickoff_start_stm32f4disco</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -20,9 +20,9 @@
 	</buildSpec>
 	<natures>
 		<nature>com.st.stm32cube.ide.mcu.MCUProjectNature</nature>
-		<nature>com.st.stm32cube.ide.mcu.MCUCubeProjectNature</nature>
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>com.st.stm32cube.ide.mcu.MCUCubeIdeServicesRevAProjectNature</nature>
+		<nature>com.st.stm32cube.ide.mcu.MCUCubeProjectNature</nature>
 		<nature>com.st.stm32cube.ide.mcu.MCUAdvancedStructureProjectNature</nature>
 		<nature>com.st.stm32cube.ide.mcu.MCUEndUserDisabledTrustZoneProjectNature</nature>
 		<nature>com.st.stm32cube.ide.mcu.MCUSingleCpuProjectNature</nature>
