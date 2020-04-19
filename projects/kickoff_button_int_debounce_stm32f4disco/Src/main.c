@@ -121,28 +121,19 @@ int main(void)
     		count = 0;
     		HAL_GPIO_TogglePin(GPIOD, LD4_Pin|LD5_Pin|LD6_Pin);
 
-    		HAL_NVIC_DisableIRQ(EXTI0_IRQn);
+    		__disable_irq();
     		HAL_GPIO_TogglePin(GPIOD, LD3_Pin);
     		if(debounce_exti0_count)
     		{
     			debounce_exti0_count--;
-                __disable_irq();
                 HAL_NVIC_EnableIRQ(EXTI0_IRQn);
                 if(HAL_NVIC_GetActive(EXTI0_IRQn))
                 {
                 	HAL_NVIC_ClearPendingIRQ(EXTI0_IRQn);
                 }
-                if(debounce_exti0_count)
-                {
-                	HAL_NVIC_DisableIRQ(EXTI0_IRQn);
-				}
-				__enable_irq();
     		}
-    		else
-    		{
-    			HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-    		}
-    		//HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+			__enable_irq();
+
     	}
     }
   }
