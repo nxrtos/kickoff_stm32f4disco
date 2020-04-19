@@ -207,12 +207,12 @@ void EXTI0_IRQHandler(void)
   /* USER CODE END EXTI0_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
   /* USER CODE BEGIN EXTI0_IRQn 1 */
+  HAL_NVIC_DisableIRQ(EXTI0_IRQn);
   if(!debounce_exti0_count)
   {
 	  HAL_GPIO_TogglePin(GPIOD, LD3_Pin);
+	  debounce_exti0_count = 5;
   }
-  debounce_exti0_count = 5;
-  HAL_NVIC_DisableIRQ(EXTI0_IRQn);
   if(HAL_NVIC_GetActive(EXTI0_IRQn))
   {
   	HAL_NVIC_ClearPendingIRQ(EXTI0_IRQn);
