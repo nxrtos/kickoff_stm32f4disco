@@ -425,7 +425,7 @@ void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState Pin
   }
 }
 
-//#define	FIX_HAL_GPIO_TogglePin_COMBINATION	1
+#define	FIX_HAL_GPIO_TogglePin_COMBINATION	1
 /**
   * @brief  Toggles the specified GPIO pins.
   * @param  GPIOx Where x can be (A..K) to select the GPIO peripheral for STM32F429X device or
