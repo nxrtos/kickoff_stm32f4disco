@@ -425,6 +425,7 @@ void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState Pin
   }
 }
 
+//#define	FIX_HAL_GPIO_TogglePin_COMBINATION	1
 /**
   * @brief  Toggles the specified GPIO pins.
   * @param  GPIOx Where x can be (A..K) to select the GPIO peripheral for STM32F429X device or
@@ -433,6 +434,30 @@ void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState Pin
   * @retval None
   */
 void HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+#if	defined(FIX_HAL_GPIO_TogglePin_COMBINATION)
+{
+  uint16_t xGPIO_Pin;
+  /* Check the parameters */
+  assert_param(IS_GPIO_PIN(GPIO_Pin));
+  assert_param(IS_GPIO_PIN_ACTION(PinState));
+
+  for (int i = 0; i < 16; i++)
+  {
+	  xGPIO_Pin = 0x01 << i;
+	  if(xGPIO_Pin & GPIO_Pin)
+	  {	// toggle xGPIO_Pin
+		if (GPIOx->ODR & xGPIO_Pin)
+		{
+		  GPIOx->BSRR = (uint32_t)xGPIO_Pin << GPIO_NUMBER;
+		}
+		else
+		{
+		  GPIOx->BSRR = xGPIO_Pin;
+		}
+	  }
+  }
+}
+#else
 {
   /* Check the parameters */
   assert_param(IS_GPIO_PIN(GPIO_Pin));
@@ -446,6 +471,7 @@ void HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
     GPIOx->BSRR = GPIO_Pin;
   }
 }
+#endif
 
 /**
   * @brief  Locks GPIO Pins configuration registers.

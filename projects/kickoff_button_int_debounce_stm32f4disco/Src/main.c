@@ -119,10 +119,9 @@ int main(void)
     	if (++count >= 0x3ffff)
     	{
     		count = 0;
-    		HAL_GPIO_TogglePin(GPIOD, LD4_Pin|LD5_Pin|LD6_Pin);
+    		HAL_GPIO_TogglePin(GPIOD, LD3_Pin|LD4_Pin|LD5_Pin|LD6_Pin);
 
     		__disable_irq();
-    		HAL_GPIO_TogglePin(GPIOD, LD3_Pin);
     		if(debounce_exti0_count)
     		{
     			debounce_exti0_count--;
