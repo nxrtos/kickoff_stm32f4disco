@@ -125,10 +125,13 @@ int main(void)
     		if(debounce_exti0_count)
     		{
     			debounce_exti0_count--;
-                HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-                if(HAL_NVIC_GetActive(EXTI0_IRQn))
+                if(!debounce_exti0_count)
                 {
-                	HAL_NVIC_ClearPendingIRQ(EXTI0_IRQn);
+                    if(HAL_NVIC_GetActive(EXTI0_IRQn))
+                    {
+                    	HAL_NVIC_ClearPendingIRQ(EXTI0_IRQn);
+                    }
+                	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
                 }
     		}
 			__enable_irq();
@@ -359,7 +362,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : CLK_IN_Pin */
   GPIO_InitStruct.Pin = CLK_IN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN; //GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
   HAL_GPIO_Init(CLK_IN_GPIO_Port, &GPIO_InitStruct);
