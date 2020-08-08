@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+volatile int  tim2_int = 0;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -126,10 +126,21 @@ int main(void)
     	if (++count >= 0x5ffff)
 	    {
     		count = 0;
-    		HAL_GPIO_TogglePin(GPIOD, LD4_Pin|LD5_Pin|LD6_Pin);
-    		HAL_UART_Transmit(&huart2, "HAL_GPIO_TogglePin 456\n\r", sizeof("HAL_GPIO_TogglePin 456\n\r"),100);
+    		HAL_GPIO_TogglePin(GPIOD, 0 |LD5_Pin|LD6_Pin);
+    		HAL_UART_Transmit(&huart2, "HAL_GPIO_TogglePin 56\n\r", sizeof("HAL_GPIO_TogglePin 456\n\r"),100);
 	    }
 	}
+	{
+
+    	if (tim2_int)
+	    {
+    		tim2_int = 0;
+    		HAL_GPIO_TogglePin(GPIOD, LD4_Pin);
+    		HAL_UART_Transmit(&huart2, "HAL_GPIO_TogglePin 4\n\r", sizeof("HAL_GPIO_TogglePin 456\n\r"),100);
+	    }
+	}
+
+
   }
   /* USER CODE END 3 */
 }
@@ -314,7 +325,7 @@ static void MX_TIM2_Init(void)
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 42949;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
-  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
   {
     Error_Handler();
@@ -333,7 +344,6 @@ static void MX_TIM2_Init(void)
   /* USER CODE BEGIN TIM2_Init 2 */
   // HAL_TIM_Base_Start(&htim2);
   HAL_TIM_Base_Start_IT(&htim2);
-
   /* USER CODE END TIM2_Init 2 */
 
 }
@@ -475,7 +485,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-
+  while (1);
   /* USER CODE END Error_Handler_Debug */
 }
 

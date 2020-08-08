@@ -23,6 +23,7 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+extern volatile int  tim2_int;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -205,11 +206,33 @@ void SysTick_Handler(void)
 void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
+#if  01
+#if  0
+  if (HAL_TIM_Base_DeInit(&htim2) != HAL_OK)
+  {
+      Error_Handler();
+  }
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 256 * 1;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 43000 * 1;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+#endif
+  htim2.Init.Period = 43000 * 10;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+      Error_Handler();
+  }
+#endif
 
   /* USER CODE END TIM2_IRQn 0 */
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
+  //HAL_TIM_Base_Stop_IT(&htim2);
+  HAL_TIM_Base_Start_IT(&htim2);
   HAL_GPIO_TogglePin(GPIOD, LD3_Pin|0);
+  tim2_int = 1;
   /* USER CODE END TIM2_IRQn 1 */
 }
 
@@ -219,11 +242,9 @@ void TIM2_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
-
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
-
   /* USER CODE END USART2_IRQn 1 */
 }
 
