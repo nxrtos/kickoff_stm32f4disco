@@ -207,6 +207,7 @@ void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
 #if  01
+  static int exp_factor = 0;
 #if  0
   if (HAL_TIM_Base_DeInit(&htim2) != HAL_OK)
   {
@@ -219,7 +220,11 @@ void TIM2_IRQHandler(void)
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
 #endif
-  htim2.Init.Period = 43000 * 10;
+  htim2.Init.Period = 43000 * (1<<exp_factor);
+
+  if( exp_factor++ >= 5)
+	  exp_factor = 0;
+
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
   {
       Error_Handler();
