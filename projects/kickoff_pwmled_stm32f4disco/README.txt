@@ -4,6 +4,8 @@ TIM4 PWM channels to LD3 LD4 LD5 LD6
 
 HAL_TIM_PWM_ConfigChannel() to change LDx's brightness
 
+gradually change LED brightness 
+
 refs
 [AN4013 Application note STM32 cross-series timer overview]
 (https://www.st.com/content/ccc/resource/technical/document/application_note/54/0f/67/eb/47/34/45/40/DM00042534.pdf/files/DM00042534.pdf/jcr:content/translations/en.DM00042534.pdf)

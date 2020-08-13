@@ -124,51 +124,100 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     {
-//    	static  unsigned long count = 0;
-    	static  uint32_t pulse = 0;
-
-//    	if (++count >= 0x7)
+    	static uint32_t count = 0;
+    	if (++count >= 0x70)
     	{
+    		static  uint32_t brightness_ch1 = 0;
+    		static  int16_t brightness_chg_ch1 = 1;
+    		static  uint32_t brightness_ch2 = 0x8000;
+    		static  int16_t brightness_chg_ch2 = 1;
+    		static  uint32_t brightness_ch3 = 0;
+    		static  int16_t brightness_chg_ch3 = 1;
+    		static  uint32_t brightness_ch4 = 0x8000;
+    		static  int16_t brightness_chg_ch4 = 1;
+
     		TIM_OC_InitTypeDef sConfigOC = {0};
-
-//    		count = 0;
-
-    		HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1);
 			sConfigOC.OCMode = TIM_OCMODE_PWM1;
-			sConfigOC.Pulse = pulse--;
+			sConfigOC.Pulse = 0;
 			sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-			sConfigOC.OCFastMode = TIM_OCFAST_ENABLE;
+			sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+
+    		count = 0;
+
+//    		HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1);
+			sConfigOC.Pulse = brightness_ch1;
+			brightness_ch1 += brightness_chg_ch1;
+			if (brightness_ch1 <= 0x100)
+			{
+				brightness_chg_ch1 = 1;
+			}
+			else if(brightness_ch1 >= 0x8000)
+			{
+				brightness_chg_ch1 = -1;
+			}
+
 			if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
 			{
 				Error_Handler();
 			}
     		HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
 
-    		HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
-			sConfigOC.Pulse = 0xffffffff - pulse ;
+//    		HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
+			sConfigOC.Pulse = brightness_ch2;
+			brightness_ch2 += brightness_chg_ch2;
+			if (brightness_ch2 <= 0x100)
+			{
+				brightness_chg_ch2 = 1;
+			}
+			else if(brightness_ch2 >= 0x8000)
+			{
+				brightness_chg_ch2 = -1;
+			}
+
 			if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
 			{
 				Error_Handler();
 			}
     		HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
 
-    		HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
-			sConfigOC.Pulse = pulse + 0x80000000;
+//    		HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
+			sConfigOC.Pulse = brightness_ch3;
+			brightness_ch3 += brightness_chg_ch3;
+			if (brightness_ch3 <= 0x100)
+			{
+				brightness_chg_ch3 = 1;
+			}
+			else if(brightness_ch3 >= 0x8000)
+			{
+				brightness_chg_ch3 = -1;
+			}
+
 			if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
 			{
 				Error_Handler();
 			}
     		HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
 
-    		HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
-			sConfigOC.Pulse = 0x80000000 - pulse ;
+//    		HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
+			sConfigOC.Pulse = brightness_ch4;
+			brightness_ch4 += brightness_chg_ch4;
+			if (brightness_ch4 <= 0x100)
+			{
+				brightness_chg_ch4 = 1;
+			}
+			else if(brightness_ch4 >= 0x8000)
+			{
+				brightness_chg_ch4 = -1;
+			}
+
 			if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
 			{
 				Error_Handler();
 			}
     		HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
 
-    		HAL_UART_Transmit(&huart2, "HAL_TIM_PWM changing \n\r", sizeof("HAL_TIM_PWM changing \n\r"),100);
+    		HAL_UART_Transmit_IT(&huart2, "HAL_TIM_PWM changing \n\r", sizeof("HAL_TIM_PWM changing \n\r"));
+
     	}
     }
   }
