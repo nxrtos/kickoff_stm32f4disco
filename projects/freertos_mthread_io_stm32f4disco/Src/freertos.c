@@ -107,6 +107,7 @@ osSemaphoreAttr_t  xSemaButtonStateChanged_attribute = {
 
 void ButtonRead_Task(void *argument)
 {
+	char buff[10] = {'0', '0', '0', '0', '0', '0', '0', '0', '0', ' '};
 	xSemaButtonStateChanged = osSemaphoreNew (1, 0 , &xSemaButtonStateChanged_attribute);
 
 	if( xSemaButtonStateChanged != NULL )
@@ -120,15 +121,20 @@ void ButtonRead_Task(void *argument)
 
     for(;;)
 	{
-        if( osSemaphoreAcquire( xSemaButtonStateChanged, ( TickType_t ) 1000 ) == osOK )
+        if( osSemaphoreAcquire( xSemaButtonStateChanged, 8000 ) == osOK )
         {
-            // We were able to obtain the semaphore
+        	uint32_t tCount = osKernelGetTickCount ();
+        	sprintf ( buff, "%8ld", tCount);
+        	HAL_UART_Transmit_IT(&huart2, (uint8_t *)buff, 10);
         	HAL_GPIO_TogglePin(GPIOD, LD3_Pin);
+        	osDelay(100);
+        	HAL_UART_Transmit_IT(&huart2, (uint8_t *)"button state changed\n\r", sizeof("button state changed\n\r"));
             // ...
         }
         else
         {
         	// timeout to acquire xSema
+        	HAL_UART_Transmit_IT(&huart2, (uint8_t *)"time expired to wait for button\r\n", sizeof("time expired to wait for button\r\n"));
         }
 
 	}

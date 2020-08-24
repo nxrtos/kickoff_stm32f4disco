@@ -27,8 +27,9 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "stdio.h"
 #include "semphr.h"
-
+#include "stm32f4xx_hal.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -61,6 +62,8 @@ extern const osThreadAttr_t groupLedTask_attributes;
 extern const osThreadAttr_t buttonReadTask_attributes;
 
 extern osSemaphoreId_t xSemaButtonStateChanged;
+
+extern UART_HandleTypeDef huart2;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
