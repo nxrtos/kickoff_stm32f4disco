@@ -1,0 +1,3 @@
+.settings/
+Debug/
+freertos_mthread_bsp_stm32f4disco.launch
