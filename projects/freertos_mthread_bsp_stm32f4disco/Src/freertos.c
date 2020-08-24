@@ -133,6 +133,8 @@ void ButtonRead_Task(void *argument)
         	sprintf ( buff, "%8ld", tCount);
         	HAL_UART_Transmit_IT(&huart2, (uint8_t *)buff, 10);
         	HAL_GPIO_TogglePin(GPIOD, LD3_Pin);
+        	osDelay(10);
+        	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
         	if(BSP_PB_GetState(BUTTON_KEY))
         	{
               osDelay(100);
