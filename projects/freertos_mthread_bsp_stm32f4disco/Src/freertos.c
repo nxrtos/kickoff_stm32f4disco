@@ -139,13 +139,27 @@ void ButtonRead_Task(void *argument)
       }
       else
       {
+    	HAL_UART_StateTypeDef  uart2_state;
+
         BSP_PB1_State = BSP_PB_Read;
         sprintf ( buff, "%8ld", tCount);
+        do
+        {
+          uart2_state = HAL_UART_GetState(&huart2);
+          osDelay(10);
+        } while( HAL_UART_STATE_BUSY_TX == uart2_state ||
+        		HAL_UART_STATE_BUSY == uart2_state) ;
         HAL_UART_Transmit_IT(&huart2, (uint8_t *)buff, 10);
         HAL_GPIO_TogglePin(GPIOD, LD3_Pin);
         osDelay(10);
         HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-        osDelay(100);
+        //osDelay(100);
+        do
+        {
+          osDelay(10);
+          uart2_state = HAL_UART_GetState(&huart2);
+        } while( HAL_UART_STATE_BUSY_TX == uart2_state ||
+        		HAL_UART_STATE_BUSY == uart2_state) ;
         if(BSP_PB1_State)
         {
           HAL_UART_Transmit_IT(&huart2, (uint8_t *)"button state high\n\r", sizeof("button state high\n\r"));
