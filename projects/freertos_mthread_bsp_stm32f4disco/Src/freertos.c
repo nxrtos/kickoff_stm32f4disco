@@ -69,28 +69,28 @@ const osThreadAttr_t groupLedTask_attributes = {
 /* USER CODE BEGIN Application */
 void SINGLELED_Task(void *argument)
 {
-	  BSP_LED_Init(LED4);
-	  /* Infinite loop */
-	  for(;;)
-	  {
-	    osDelay(100);
-	    BSP_LED_Toggle(LED4);
-	  }
-
+  BSP_LED_Init(LED4);
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(100);
+    BSP_LED_Toggle(LED4);
+  }
 }
+
 void GROUPLED_Task(void *argument)
 {
-	  BSP_LED_Init(LED3);
-	  BSP_LED_Init(LED5);
-	  BSP_LED_Init(LED6);
-	  /* Infinite loop */
-	  for(;;)
-	  {
-	    osDelay(400);
-	    BSP_LED_Toggle(LED3);
-	    BSP_LED_Toggle(LED5);
-	    BSP_LED_Toggle(LED6);
-	  }
+  BSP_LED_Init(LED3);
+  BSP_LED_Init(LED5);
+  BSP_LED_Init(LED6);
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(400);
+    BSP_LED_Toggle(LED3);
+    BSP_LED_Toggle(LED5);
+    BSP_LED_Toggle(LED6);
+  }
 }
 
 const osThreadAttr_t buttonReadTask_attributes = {
@@ -104,57 +104,64 @@ StaticSemaphore_t	xSemaButton_cb_mem;
 osSemaphoreId_t xSemaButtonStateChanged;
 
 osSemaphoreAttr_t  xSemaButtonStateChanged_attribute = {
-				.name = "semaButtonStateChanged",
-				.cb_mem = &xSemaButton_cb_mem,    ///< memory for control block
-				.cb_size = sizeof(StaticSemaphore_t),   ///< size of provided memory for control block
+                .name = "semaButtonStateChanged",
+                .cb_mem = &xSemaButton_cb_mem,    ///< memory for control block
+                .cb_size = sizeof(StaticSemaphore_t),   ///< size of provided memory for control block
 };
 
 void ButtonRead_Task(void *argument)
 {
-	char buff[10] = {'0', '0', '0', '0', '0', '0', '0', '0', '0', ' '};
-	xSemaButtonStateChanged = osSemaphoreNew (1, 0 , &xSemaButtonStateChanged_attribute);
+  char buff[10] = {'0', '0', '0', '0', '0', '0', '0', '0', '0', ' '};
+  xSemaButtonStateChanged = osSemaphoreNew (1, 0 , &xSemaButtonStateChanged_attribute);
+  uint32_t BSP_PB1_State = 0xffff;
 
-	if( xSemaButtonStateChanged != NULL )
+  if( xSemaButtonStateChanged != NULL )
+  {	//BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_EXTI);
+    /* EXTI interrupt init*/
+    // the preemption priority for EXTI0_IRQn has to be above or equal to
+    // configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY in order to invoke syscall
+    // from EXTI0_ISR
+    HAL_NVIC_SetPriority(EXTI0_IRQn, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY +1, 0);
+	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+  }
+
+  for(;;)
+  {
+    if( osSemaphoreAcquire( xSemaButtonStateChanged, 8000 ) == osOK )
     {
-	  //BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_EXTI);
-	  /* EXTI interrupt init*/
-	  // the preemption priority for EXTI0_IRQn has to be above or equal to
-	  // configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY in order to invoke syscall
-	  // from EXTI0_ISR
-	  HAL_NVIC_SetPriority(EXTI0_IRQn, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY +1, 0);
-	  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-    }
+      uint32_t tCount = osKernelGetTickCount();
+      uint32_t BSP_PB_Read = BSP_PB_GetState(BUTTON_KEY);
 
-    for(;;)
-	{
-        if( osSemaphoreAcquire( xSemaButtonStateChanged, 8000 ) == osOK )
+      if(BSP_PB1_State == BSP_PB_Read)
+	  {
+        osDelay(10);
+        HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+      }
+      else
+      {
+        BSP_PB1_State = BSP_PB_Read;
+        sprintf ( buff, "%8ld", tCount);
+        HAL_UART_Transmit_IT(&huart2, (uint8_t *)buff, 10);
+        HAL_GPIO_TogglePin(GPIOD, LD3_Pin);
+        osDelay(10);
+        HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+        osDelay(100);
+        if(BSP_PB1_State)
         {
-        	uint32_t tCount = osKernelGetTickCount ();
-        	sprintf ( buff, "%8ld", tCount);
-        	HAL_UART_Transmit_IT(&huart2, (uint8_t *)buff, 10);
-        	HAL_GPIO_TogglePin(GPIOD, LD3_Pin);
-        	osDelay(10);
-        	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-        	if(BSP_PB_GetState(BUTTON_KEY))
-        	{
-              osDelay(100);
-              HAL_UART_Transmit_IT(&huart2, (uint8_t *)"button state high\n\r", sizeof("button state high\n\r"));
-
-        	}
-        	else
-        	{
-              osDelay(100);
-              HAL_UART_Transmit_IT(&huart2, (uint8_t *)"button state low\n\r", sizeof("button state low\n\r"));
-        	}
+          HAL_UART_Transmit_IT(&huart2, (uint8_t *)"button state high\n\r", sizeof("button state high\n\r"));
         }
         else
         {
-        	// timeout to acquire xSema
-        	HAL_UART_Transmit_IT(&huart2, (uint8_t *)"time expired to wait for button\r\n", sizeof("time expired to wait for button\r\n"));
+          HAL_UART_Transmit_IT(&huart2, (uint8_t *)"button state low\n\r", sizeof("button state low\n\r"));
         }
-
-	}
-
+      }
+    }
+    else
+    {
+      // timeout to acquire xSema
+      HAL_UART_Transmit_IT(&huart2, (uint8_t *)"time expired to wait for button\r\n", sizeof("time expired to wait for button\r\n"));
+    }
+  }
 }
 
 /* USER CODE END Application */
